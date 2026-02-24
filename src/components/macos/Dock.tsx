@@ -67,15 +67,18 @@ function DockIcon({ item, mouseX, isOpen }: {
       <img
         src={item.icon}
         alt={item.label}
-        className="w-12 h-12 object-contain drop-shadow-lg group-hover:brightness-110 transition-all"
+        className="w-12 h-12 object-contain drop-shadow-lg transition-[filter] duration-150"
+        style={{ filter: 'brightness(1)' }}
+        onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.15)'}
+        onMouseLeave={(e) => e.currentTarget.style.filter = 'brightness(1)'}
         draggable={false}
       />
       {isOpen && (
         <div className="absolute -bottom-1.5 w-1 h-1 rounded-full bg-foreground/80" />
       )}
       {/* Tooltip */}
-      <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity
-        bg-secondary/90 text-foreground text-xs px-2 py-1 rounded-md whitespace-nowrap pointer-events-none">
+      <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity
+        mac-glass text-foreground text-xs px-3 py-1 rounded-md whitespace-nowrap pointer-events-none shadow-lg">
         {item.label}
       </div>
     </motion.div>
