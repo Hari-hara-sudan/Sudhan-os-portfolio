@@ -3,7 +3,7 @@ import { useWindowStore } from '@/stores/windowStore';
 
 const MenuBar = memo(() => {
   const [time, setTime] = useState(new Date());
-  const { toggleSpotlight, openWindow } = useWindowStore();
+  const { toggleSpotlight, activeWindowId } = useWindowStore();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -21,12 +21,18 @@ const MenuBar = memo(() => {
     hour12: true,
   });
 
-  const menuItems = [
-    { label: 'About', action: () => openWindow('notes') },
-    { label: 'Projects', action: () => openWindow('finder') },
-    { label: 'Skills', action: () => openWindow('terminal') },
-    { label: 'Resume', action: () => openWindow('preview') },
-  ];
+  // macOS-style app menus based on active window
+  const appMenus: Record<string, string[]> = {
+    finder: ['Finder', 'File', 'Edit', 'View', 'Sort By', 'Folders', 'Window'],
+    notes: ['Notes', 'File', 'Edit', 'Format', 'View', 'Window'],
+    terminal: ['Terminal', 'Shell', 'Edit', 'View', 'Profiles', 'Window'],
+    safari: ['Safari', 'File', 'Edit', 'View', 'History', 'Bookmarks', 'Window'],
+    preview: ['Preview', 'File', 'Edit', 'View', 'Go', 'Tools', 'Window'],
+  };
+
+  const currentMenus = activeWindowId && appMenus[activeWindowId]
+    ? appMenus[activeWindowId]
+    : ['Finder', 'File', 'Edit', 'View', 'Go', 'Window', 'Help'];
 
   return (
     <div className="fixed top-0 left-0 right-0 mac-glass z-[9999] flex items-center justify-between px-4"
@@ -34,17 +40,19 @@ const MenuBar = memo(() => {
       {/* Left */}
       <div className="flex items-center gap-4">
         {/* Apple Logo */}
-        <button className="text-foreground/90 hover:text-foreground text-sm font-medium">
+        <button className="text-foreground/90 hover:text-foreground text-[14px] font-medium">
           
         </button>
-        <span className="text-foreground/90 text-[13px] font-semibold">Hari OS</span>
-        {menuItems.map((item) => (
+        {currentMenus.map((item, i) => (
           <button
-            key={item.label}
-            onClick={item.action}
-            className="text-foreground/70 hover:text-foreground text-[13px] transition-colors"
+            key={item}
+            className={`text-[13px] transition-colors ${
+              i === 0
+                ? 'text-foreground/90 font-semibold'
+                : 'text-foreground/70 hover:text-foreground'
+            }`}
           >
-            {item.label}
+            {item}
           </button>
         ))}
       </div>

@@ -29,9 +29,8 @@ const MacWindow = memo(({ windowState, children }: WindowProps) => {
         <Draggable
           nodeRef={nodeRef as any}
           handle=".window-header"
-          position={windowState.position}
+          defaultPosition={windowState.position}
           onStop={handleDragStop}
-          bounds="parent"
         >
           <motion.div
             ref={nodeRef}
