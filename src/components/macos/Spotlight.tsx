@@ -114,8 +114,8 @@ const Spotlight = memo(() => {
                     }}
                     onMouseEnter={() => setSelectedIndex(i)}
                   >
-                    {item.id === 'linkedin' ? (
-                      <img src={item.icon} alt="LinkedIn" className="w-6 h-6 rounded" />
+                    {item.id === 'linkedin' || item.id === 'github' ? (
+                      <img src={item.icon} alt={item.label} className="w-6 h-6 rounded" />
                     ) : (
                       <span className="text-xl">{item.icon}</span>
                     )}
