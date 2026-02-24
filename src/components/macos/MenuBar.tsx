@@ -1,86 +1,102 @@
-import { useState, useEffect, memo } from 'react';
-import { useWindowStore } from '@/stores/windowStore';
+import React, { useState, useRef, useEffect } from "react";
+import appleIcon from "../../assets/icons/apple.png";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import { Calendar } from "../ui/calendar";
+import avatarImg from "../../assets/icons/avatar.jpg";
+import Spotlight from "./Spotlight";
+import { FaSearch } from "react-icons/fa";
+import { useWindowStore } from "@/stores/windowStore";
 
-const MenuBar = memo(() => {
-  const [time, setTime] = useState(new Date());
-  const { toggleSpotlight, activeWindowId } = useWindowStore();
+// Utility to get current date and time as 'Mon Feb 24, 2026 10:30 AM'
+function getCurrentDateTime() {
+	const now = new Date();
+	const date = now.toLocaleDateString(undefined, {
+		weekday: "short",
+		month: "short",
+		day: "2-digit",
+		year: "numeric",
+	});
+	const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+	return `${date} ${time}`;
+}
 
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+const MenuBar: React.FC = () => {
+		const { toggleSpotlight } = useWindowStore();
+	const [dateTime, setDateTime] = useState(getCurrentDateTime());
 
-  const formattedDate = time.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
-  const formattedTime = time.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setDateTime(getCurrentDateTime());
+		}, 1000 * 30); // update every 30 seconds
+		return () => clearInterval(interval);
+	}, []);
 
-  // macOS-style app menus based on active window
-  const appMenus: Record<string, string[]> = {
-    finder: ['Finder', 'File', 'Edit', 'View', 'Sort By', 'Folders', 'Window'],
-    notes: ['Notes', 'File', 'Edit', 'Format', 'View', 'Window'],
-    terminal: ['Terminal', 'Shell', 'Edit', 'View', 'Profiles', 'Window'],
-    safari: ['Safari', 'File', 'Edit', 'View', 'History', 'Bookmarks', 'Window'],
-    preview: ['Preview', 'File', 'Edit', 'View', 'Go', 'Tools', 'Window'],
-  };
+	const [calendarOpen, setCalendarOpen] = useState(false);
+	const calendarPopoverRef = useRef<HTMLDivElement>(null);
 
-  const currentMenus = activeWindowId && appMenus[activeWindowId]
-    ? appMenus[activeWindowId]
-    : ['Finder', 'File', 'Edit', 'View', 'Go', 'Window', 'Help'];
+	// Close calendar popover on outside click
+	useEffect(() => {
+		function handleClick(e: MouseEvent) {
+			if (
+				calendarPopoverRef.current &&
+				!calendarPopoverRef.current.contains(e.target as Node)
+			) {
+				setCalendarOpen(false);
+			}
+		}
+		if (calendarOpen) {
+			document.addEventListener("mousedown", handleClick);
+		} else {
+			document.removeEventListener("mousedown", handleClick);
+		}
+		return () => document.removeEventListener("mousedown", handleClick);
+	}, [calendarOpen]);
 
-  return (
-    <div className="fixed top-0 left-0 right-0 mac-glass z-[9999] flex items-center justify-between px-4"
-      style={{ height: 'var(--mac-menubar-height)' }}>
-      {/* Left */}
-      <div className="flex items-center gap-4">
-        {/* Apple Logo */}
-        <button className="text-foreground/90 hover:text-foreground text-[14px] font-medium">
-          
-        </button>
-        {currentMenus.map((item, i) => (
-          <button
-            key={item}
-            className={`text-[13px] transition-colors ${
-              i === 0
-                ? 'text-foreground/90 font-semibold'
-                : 'text-foreground/70 hover:text-foreground'
-            }`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
+	return (
+		<div className="relative flex items-center h-8 px-2 bg-[#23242b]/90 text-white select-none w-full shadow-sm">
+			{/* Left: Apple icon */}
+			<div className="flex items-center gap-2 z-10">
+				<img src={appleIcon} alt="Apple" className="w-5 h-5" />
+			</div>
 
-      {/* Right */}
-      <div className="flex items-center gap-3 text-foreground/80 text-[13px]">
-        {/* WiFi */}
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 18c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1m0-4c2.76 0 5 2.24 5 5h-2c0-1.66-1.34-3-3-3s-3 1.34-3 3H7c0-2.76 2.24-5 5-5m0-4c4.97 0 9 4.03 9 9h-2c0-3.87-3.13-7-7-7s-7 3.13-7 7H3c0-4.97 4.03-9 9-9" />
-        </svg>
-        {/* Battery */}
-        <svg className="w-5 h-4" fill="currentColor" viewBox="0 0 24 24">
-          <rect x="2" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5" />
-          <rect x="4" y="8" width="12" height="8" rx="1" fill="currentColor" opacity="0.7" />
-          <rect x="20" y="9" width="2" height="6" rx="1" fill="currentColor" />
-        </svg>
-        <span>{formattedDate} {formattedTime}</span>
-        {/* Spotlight */}
-        <button onClick={toggleSpotlight} className="hover:text-foreground transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="6" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-});
+			{/* Center: Date and Time (absolutely centered, clickable) */}
+			<div
+				className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-medium tracking-wider whitespace-nowrap select-none cursor-pointer"
+				style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif" }}
+				onClick={() => setCalendarOpen((v) => !v)}
+			>
+				{dateTime}
+			</div>
 
-MenuBar.displayName = 'MenuBar';
+			{/* Top right: Calendar popover only (no button) */}
+			{calendarOpen && (
+				<div
+					ref={calendarPopoverRef}
+					className="mac-glass absolute top-10 right-3 z-50 rounded-xl shadow-lg p-3 animate-fade-in"
+					style={{ minWidth: 260 }}
+				>
+					<Calendar />
+				</div>
+			)}
+
+			{/* Right: Spotlight and Avatar dropdown */}
+			<div className="ml-auto z-10 flex items-center gap-2">
+				{/* Spotlight trigger */}
+				<button
+					className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 hover:bg-black/50 text-white shadow transition-colors"
+					style={{ backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
+					onClick={toggleSpotlight}
+					aria-label="Open Spotlight"
+				>
+					<FaSearch size={15} />
+				</button>
+			</div>
+
+			{/* Spotlight overlay (renders at root level) */}
+			<Spotlight />
+		</div>
+	);
+};
+
+
 export default MenuBar;

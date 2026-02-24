@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import linkedinIcon from '@/assets/icons/linkedin.png';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowStore } from '@/stores/windowStore';
+import GithubIcon from '@/assets/icons/github.png';
 
 const searchItems = [
   { id: 'notes', label: 'About Me', icon: '📝', category: 'Apps' },
@@ -8,8 +10,8 @@ const searchItems = [
   { id: 'terminal', label: 'Skills', icon: '⌨️', category: 'Apps' },
   { id: 'preview', label: 'Resume', icon: '📄', category: 'Apps' },
   { id: 'safari', label: 'Links', icon: '🌐', category: 'Apps' },
-  { id: 'github', label: 'GitHub', icon: '🐙', category: 'Links', url: 'https://github.com' },
-  { id: 'linkedin', label: 'LinkedIn', icon: '💼', category: 'Links', url: 'https://linkedin.com' },
+  { id: 'github', label: 'GitHub', icon: GithubIcon, category: 'Links', url: 'https://github.com' },
+  { id: 'linkedin', label: 'LinkedIn', icon: linkedinIcon, category: 'Links', url: 'https://www.linkedin.com/in/harihara-sudan-kmu/' },
 ];
 
 const Spotlight = memo(() => {
@@ -112,7 +114,11 @@ const Spotlight = memo(() => {
                     }}
                     onMouseEnter={() => setSelectedIndex(i)}
                   >
-                    <span className="text-xl">{item.icon}</span>
+                    {item.id === 'linkedin' ? (
+                      <img src={item.icon} alt="LinkedIn" className="w-6 h-6 rounded" />
+                    ) : (
+                      <span className="text-xl">{item.icon}</span>
+                    )}
                     <div>
                       <div className="text-sm font-medium">{item.label}</div>
                       <div className="text-xs opacity-60">{item.category}</div>

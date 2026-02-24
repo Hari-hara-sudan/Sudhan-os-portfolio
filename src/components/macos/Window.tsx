@@ -10,6 +10,12 @@ interface WindowProps {
 
 const MacWindow = memo(({ windowState, children }: WindowProps) => {
   const { closeWindow, minimizeWindow, focusWindow, updatePosition, activeWindowId } = useWindowStore();
+  const [isMaximized, setIsMaximized] = useState(false);
+    // Maximize handler
+    const handleMaximize = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsMaximized((prev) => !prev);
+    }, []);
   const nodeRef = useRef<HTMLDivElement>(null);
   const isActive = activeWindowId === windowState.id;
   const [hasEntered, setHasEntered] = useState(false);
@@ -36,11 +42,21 @@ const MacWindow = memo(({ windowState, children }: WindowProps) => {
           <div
             ref={nodeRef}
             className="absolute"
-            style={{
-              width: windowState.size.width,
-              height: windowState.size.height,
-              zIndex: windowState.zIndex,
-            }}
+            style={
+              isMaximized
+                ? {
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: windowState.zIndex,
+                  }
+                : {
+                    width: windowState.size.width,
+                    height: windowState.size.height,
+                    zIndex: windowState.zIndex,
+                  }
+            }
             onMouseDown={handleFocus}
           >
             <motion.div
@@ -59,14 +75,32 @@ const MacWindow = memo(({ windowState, children }: WindowProps) => {
                   style={{ background: 'hsl(var(--mac-window-header))' }}>
                   <div className="flex items-center gap-2">
                     <button
-                      className="traffic-light traffic-red"
+                      className="traffic-light traffic-red flex items-center justify-center text-[10px] font-bold p-0"
                       onClick={(e) => { e.stopPropagation(); closeWindow(windowState.id); }}
-                    />
+                      title="Close"
+                      aria-label="Close"
+                      style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+                    >
+                      <span className="traffic-symbol" style={{ color: '#7d2222', fontWeight: 700, fontSize: 12, width: '100%', height: '100%', lineHeight: 1, justifyContent: 'center', alignItems: 'center' }}>×</span>
+                    </button>
                     <button
-                      className="traffic-light traffic-yellow"
+                      className="traffic-light traffic-yellow flex items-center justify-center text-[10px] font-bold p-0"
                       onClick={(e) => { e.stopPropagation(); minimizeWindow(windowState.id); }}
-                    />
-                    <button className="traffic-light traffic-green" />
+                      title="Minimize"
+                      aria-label="Minimize"
+                      style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+                    >
+                      <span className="traffic-symbol" style={{ color: '#a16207', fontWeight: 700, fontSize: 14, width: '100%', height: '100%', lineHeight: 1, justifyContent: 'center', alignItems: 'center' }}>–</span>
+                    </button>
+                    <button
+                      className="traffic-light traffic-green flex items-center justify-center text-[10px] font-bold p-0"
+                      onClick={handleMaximize}
+                      title="Maximize"
+                      aria-label="Maximize"
+                      style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
+                    >
+                      <span className="traffic-symbol" style={{ color: '#166534', fontWeight: 700, fontSize: 12, width: '100%', height: '100%', lineHeight: 1, justifyContent: 'center', alignItems: 'center' }}>⤢</span>
+                    </button>
                   </div>
                   <span className="flex-1 text-center text-xs font-medium"
                     style={{ color: 'hsl(220 10% 40%)' }}>

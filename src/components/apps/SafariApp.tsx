@@ -1,10 +1,13 @@
 import { memo } from 'react';
-
+import linkedinIcon from '@/assets/icons/linkedin.png';
+import githubIcon from '@/assets/icons/github.png';
+import gmailIcon from '@/assets/icons/gmail.png';
+import favvvIcon from '@/assets/icons/favvv.png';
 const links = [
-  { label: 'GitHub', url: 'https://github.com', icon: '🐙', description: 'View my open-source projects and contributions' },
-  { label: 'LinkedIn', url: 'https://linkedin.com', icon: '💼', description: 'Connect with me professionally' },
-  { label: 'Portfolio', url: '#', icon: '🌐', description: "You're looking at it right now!" },
-  { label: 'Email', url: 'mailto:hariharasudhan2212@gmail.com', icon: '✉️', description: 'hariharasudhan2212@gmail.com' },
+  { label: 'GitHub', url: 'https://github.com/Hari-hara-sudan', icon: githubIcon, description: 'View my open-source projects and contributions', isImg: true },
+  { label: 'LinkedIn', url: 'https://www.linkedin.com/in/harihara-sudan-kmu/', icon: linkedinIcon, description: 'Connect with me professionally', isImg: true },
+  { label: 'Portfolio', url: '#', icon: favvvIcon, description: "You're looking at it right now!", isImg: true },
+  { label: 'Email', url: 'mailto:hariharasudhan2212@gmail.com', icon: gmailIcon, description: 'hariharasudhan2212@gmail.com', isImg: true },
 ];
 
 const SafariApp = memo(() => (
@@ -39,7 +42,13 @@ const SafariApp = memo(() => (
               transition-all group"
             style={{ background: 'hsl(220 10% 98%)' }}
           >
-            <div className="text-2xl mb-2">{link.icon}</div>
+            <div className="text-2xl mb-2">
+              {link.isImg ? (
+                <img src={link.icon} alt={link.label} className="w-8 h-8 rounded" />
+              ) : (
+                link.icon
+              )}
+            </div>
             <div className="text-sm font-semibold text-black/80 group-hover:text-blue-500 transition-colors">
               {link.label}
             </div>

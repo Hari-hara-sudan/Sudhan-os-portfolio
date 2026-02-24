@@ -1,4 +1,4 @@
-import { memo, lazy, Suspense } from 'react';
+import { memo, lazy, Suspense, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useWindowStore } from '@/stores/windowStore';
 import MenuBar from './MenuBar';
@@ -24,9 +24,30 @@ const appComponents: Record<string, React.LazyExoticComponent<React.ComponentTyp
 const Desktop = memo(() => {
   const windows = useWindowStore((s) => s.windows);
   const hasOpenWindows = Object.values(windows).some(w => w.isOpen && !w.isMinimized);
+  const [fullscreenPrompt, setFullscreenPrompt] = useState(true);
+
+  // Request fullscreen
+  const handleFullscreen = () => {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+    else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen();
+    setFullscreenPrompt(false);
+  };
 
   return (
-    <div className="w-screen h-screen overflow-hidden relative">
+    <div className="min-h-screen h-screen w-screen relative overflow-hidden">
+      {fullscreenPrompt && (
+        <div className="fixed inset-0 z-[999999] flex flex-col items-center justify-center bg-black/80 text-white">
+          <div className="text-2xl font-bold mb-4">Please enter fullscreen to continue</div>
+          <button
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-lg font-semibold transition-colors"
+            onClick={handleFullscreen}
+          >
+            Enter Fullscreen
+          </button>
+        </div>
+      )}
       {/* Wallpaper */}
       <img
         src={wallpaper}

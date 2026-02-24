@@ -80,9 +80,11 @@
   }
 
   .mac-dock-glass {
-    background: hsla(var(--mac-dock-bg) / 0.4);
+    background: hsla(var(--mac-dock-bg) / 0.85); /* dark glass, no white */
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.08) inset;
+    border: 1px solid rgba(255,255,255,0.10);
   }
 
   .mac-spotlight-glass {
@@ -97,6 +99,21 @@
 
   .traffic-light {
     @apply w-3 h-3 rounded-full cursor-pointer transition-all;
+    position: relative;
+  }
+
+  .traffic-symbol {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .traffic-light:hover .traffic-symbol {
+    display: flex;
   }
 
   .traffic-light:hover {

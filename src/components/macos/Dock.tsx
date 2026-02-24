@@ -10,11 +10,11 @@ import previewIcon from '@/assets/icons/preview.png';
 import trashIcon from '@/assets/icons/trash.png';
 
 const dockItems = [
-  { id: 'finder', label: 'Finder', icon: finderIcon },
-  { id: 'notes', label: 'Notes', icon: notesIcon },
-  { id: 'terminal', label: 'Terminal', icon: terminalIcon },
-  { id: 'safari', label: 'Safari', icon: safariIcon },
-  { id: 'preview', label: 'Preview', icon: previewIcon },
+  { id: 'finder', label: 'Projects', icon: finderIcon },
+  { id: 'notes', label: 'About', icon: notesIcon },
+  { id: 'terminal', label: 'Skills', icon: terminalIcon },
+  { id: 'safari', label: 'Links', icon: safariIcon },
+  { id: 'preview', label: 'Resume', icon: previewIcon },
   { id: 'trash', label: 'Trash', icon: trashIcon },
 ];
 
@@ -29,7 +29,10 @@ function DockIcon({ item, mouseX, isOpen }: {
   isOpen: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { openWindow, restoreWindow, windows } = useWindowStore();
+    const openWindow = useWindowStore((s) => s.openWindow);
+    const restoreWindow = useWindowStore((s) => s.restoreWindow);
+    const windows = useWindowStore((s) => s.windows);
+    const closeAllWindows = useWindowStore((s) => s.closeAllWindows);
 
   const distance = useTransform(mouseX, (val: number) => {
     if (!ref.current || val === -1) return 999;
@@ -47,14 +50,17 @@ function DockIcon({ item, mouseX, isOpen }: {
   const translateY = useTransform(springScale, (s: number) => -(s - 1) * 20);
 
   const handleClick = useCallback(() => {
-    if (item.id === 'trash') return;
+    if (item.id === 'trash') {
+      closeAllWindows();
+      return;
+    }
     const win = windows[item.id];
     if (win?.isOpen && win?.isMinimized) {
       restoreWindow(item.id);
     } else {
       openWindow(item.id);
     }
-  }, [item.id, windows, openWindow, restoreWindow]);
+  }, [item.id, windows, openWindow, restoreWindow, closeAllWindows]);
 
   return (
     <motion.div
@@ -98,9 +104,9 @@ const Dock = memo(() => {
   }, [mouseX]);
 
   return (
-    <div className="fixed bottom-2 left-1/2 -translate-x-1/2 z-[9998]">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9998] w-[380px] md:w-[480px] lg:w-[560px]">
       <motion.div
-        className="mac-dock-glass rounded-2xl px-3 py-2 flex items-end gap-2"
+        className="mac-dock-glass rounded-2xl px-6 py-1 flex items-end gap-5 w-full justify-center"
         style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)' }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}

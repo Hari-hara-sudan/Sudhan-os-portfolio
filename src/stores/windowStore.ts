@@ -12,6 +12,7 @@ export interface WindowState {
 }
 
 interface WindowStore {
+    closeAllWindows: () => void;
   windows: Record<string, WindowState>;
   activeWindowId: string | null;
   highestZ: number;
@@ -76,6 +77,13 @@ const defaultWindows: Record<string, WindowState> = {
 };
 
 export const useWindowStore = create<WindowStore>((set) => ({
+    closeAllWindows: () =>
+      set((state) => ({
+        windows: Object.fromEntries(
+          Object.entries(state.windows).map(([id, win]) => [id, { ...win, isOpen: false }])
+        ),
+        activeWindowId: null,
+      })),
   windows: defaultWindows,
   activeWindowId: null,
   highestZ: 0,
